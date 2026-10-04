@@ -1,30 +1,41 @@
-# Vehicle Inventory API — Portfolio Documentation
+# Vehicle Inventory API — Technical Documentation Portfolio
 
-A sanitized technical documentation portfolio project based on a vehicle inventory API.
+A sanitized, portfolio-ready documentation project based on a vehicle inventory API and a separate search service.
 
-> **Portfolio disclaimer:** This repository is a reconstructed and anonymized documentation sample. It does not reproduce proprietary company names, internal hostnames, source-system identifiers, credentials, or confidential business information.
+> **Portfolio disclaimer:** This repository is an anonymized reconstruction for demonstration purposes. It does not publish proprietary company names, internal URLs, source-system names, credentials, or confidential business information.
 
-## Scope
+## What this demonstrates
 
-The documentation demonstrates:
+- Developer-oriented information architecture
+- API reference writing
+- Request and response documentation
+- Complex search filters and pagination
+- Authentication and error handling
+- Clear examples for developers
+- GitHub Pages-ready static documentation
 
-- API overview and terminology
-- Authentication guidance
-- Vehicle listing
-- Vehicle detail retrieval
-- Search workflow (portfolio adaptation)
-- Query parameters and response fields
-- HTTP status codes
-- Developer-oriented examples
+## Endpoints
 
-## Local preview
+- `GET /vehicles/list` — list vehicles
+- `GET /vehicles/details` — retrieve a vehicle
+- `POST /vehicles/search` — search vehicles using structured filters
 
-Open `docs/index.html` in a browser.
+## Important note about the search endpoint
 
-## GitHub Pages
+The search capability came from a separate microservice in the source material. For this portfolio version, it has been normalized into the same documentation experience as the list and details endpoints. The original `/v3/vehicle/search` and `/v4/vehicle/search` routes are intentionally not exposed.
 
-Publish the `/docs` folder from the `main` branch under **Settings → Pages**.
+The search contract has been sanitized: internal source mappings, corporate environments, proprietary identifiers, and real-world examples have been removed or replaced with neutral examples.
 
-## Important
+## Run locally
 
-Do not publish the original OpenAPI specification if it contains proprietary information. Use the sanitized specification included in this repository as a portfolio-only reconstruction.
+Open `docs/index.html` directly in a browser.
+
+## Publish with GitHub Pages
+
+1. Push the repository to GitHub.
+2. Open **Settings → Pages**.
+3. Select **Deploy from a branch**.
+4. Select the `main` branch and `/docs` folder.
+5. Save.
+
+GitHub Pages visibility depends on your GitHub plan and repository settings. Do not assume that a private repository makes the published site private.

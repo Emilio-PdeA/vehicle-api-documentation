@@ -1,10 +1,11 @@
 openapi: 3.0.3
 info:
   title: Vehicle Inventory API
-  version: 1.0.0
+  version: 1.1.0
   description: |
-    A portfolio-safe API specification for a vehicle inventory service.
-    The API exposes vehicle availability, detail retrieval, and search capabilities.
+    A sanitized API specification for a vehicle inventory service.
+    The portfolio documentation covers vehicle listing, detail retrieval,
+    and structured vehicle search.
 
 servers:
   - url: https://api.example.com/v1
@@ -12,6 +13,10 @@ servers:
 
 security:
   - bearerAuth: []
+
+tags:
+  - name: Vehicles
+    description: Vehicle inventory operations.
 
 components:
   securitySchemes:
@@ -23,11 +28,6 @@ components:
   schemas:
     Vehicle:
       type: object
-      required:
-        - id
-        - configurationId
-        - marketCode
-        - status
       properties:
         id:
           type: string
@@ -41,28 +41,65 @@ components:
           type: string
           description: Market associated with the vehicle.
           example: ES
-        salesChannel:
-          type: string
-          description: Sales channel where the vehicle is available.
-          example: retail
         status:
           type: string
           description: Current availability status.
-          enum: [available, reserved, sold]
           example: available
-        productionStatus:
+        modelName:
           type: string
-          description: Current production stage.
-          example: ready
-        productionDate:
+          description: Vehicle model name.
+          example: Example SUV
+        bodyType:
+          type: string
+          description: Vehicle body type.
+          example: SUV
+        engineConcept:
+          type: string
+          description: Engine or powertrain concept.
+          example: hybrid
+        power:
+          type: object
+          properties:
+            value:
+              type: number
+              example: 160
+            unit:
+              type: string
+              example: kW
+        currency:
+          type: string
+          description: Currency used for price values.
+          example: EUR
+        grossListPrice:
+          type: number
+          description: Gross list price in the selected currency.
+          example: 43797.95
+        estimatedDeliveryDate:
           type: string
           format: date-time
-          description: Production date and time, when available.
-          example: '2026-01-25T00:00:00Z'
-        ecommerceReady:
+          description: Estimated delivery date, when available.
+          example: '2026-03-18T12:00:00Z'
+        onlineAvailable:
           type: boolean
-          description: Indicates whether the vehicle is ready for an online sales flow.
+          description: Indicates whether the vehicle is available through an online sales flow.
           example: true
+
+    ResultInfo:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+          example: success
+        returnedRecords:
+          type: integer
+          example: 10
+        totalRecords:
+          type: integer
+          example: 42
+        page:
+          type: integer
+          example: 0
 
     VehicleListResponse:
       type: object
@@ -82,19 +119,158 @@ components:
         data:
           $ref: '#/components/schemas/Vehicle'
 
-    ResultInfo:
+    SearchRequest:
+      type: object
+      required:
+        - page
+      properties:
+        page:
+          type: integer
+          minimum: 0
+          description: Zero-based page number.
+          example: 0
+        perPage:
+          type: integer
+          minimum: 1
+          description: Maximum number of records to return per page.
+          example: 20
+        orderId:
+          type: array
+          items: { type: string }
+          description: Filter by one or more order identifiers.
+        configurationId:
+          type: array
+          items: { type: string }
+          description: Filter by one or more vehicle configuration identifiers.
+        marketCode:
+          type: array
+          items: { type: string }
+          description: Filter by one or more market codes.
+        vehicleId:
+          type: array
+          items: { type: string }
+          description: Filter by vehicle identifiers such as VIN-like IDs.
+        productGroup:
+          type: array
+          items: { type: string }
+          description: Filter by product group.
+        modelName:
+          type: array
+          items: { type: string }
+          description: Filter by model name.
+        bodyType:
+          type: array
+          items: { type: string }
+          description: Filter by body type.
+        engineConcept:
+          type: array
+          items: { type: string }
+          description: Filter by engine or powertrain concept.
+        visibility:
+          type: array
+          items: { type: string }
+          description: Filter by vehicle visibility state.
+        availability:
+          type: array
+          items: { type: string }
+          description: Filter by availability state.
+        customerOrderBlocked:
+          type: array
+          items: { type: boolean }
+          description: Filter by customer-order blocking state.
+        onlineAvailable:
+          type: array
+          items: { type: boolean }
+          description: Filter for vehicles available through an online flow.
+        aggregations:
+          type: array
+          items:
+            type: string
+            enum:
+              - vehicleClass
+              - vehicleBodyGroup
+              - vehicleModel
+              - vehicleEngineConcept
+              - vehiclePrimaryColor
+              - vehicleUpholstery
+              - vehicleOptions
+              - vehicleEngineName
+          description: Optional aggregation groups to include in the response.
+        sortBy:
+          type: object
+          properties:
+            fieldName:
+              type: string
+              enum:
+                - estimatedDeliveryDate
+                - grossListPrice
+                - actualFinalDate
+                - amendableUntil
+            sortType:
+              type: string
+              enum: [ASC, DESC]
+              default: ASC
+        actualFinalDate:
+          type: object
+          properties:
+            from:
+              type: string
+              format: date
+              example: '2026-01-01'
+            to:
+              type: string
+              format: date
+              example: '2026-12-31'
+        grossListPrice:
+          type: object
+          properties:
+            min:
+              type: number
+              example: 20000
+            max:
+              type: number
+              example: 100000
+        configurationCode:
+          type: object
+          properties:
+            mustNot:
+              type: array
+              items: { type: string }
+            must:
+              type: array
+              items: { type: string }
+            should:
+              type: array
+              items: { type: string }
+        isLegacy:
+          type: boolean
+          description: Filter legacy vehicle records.
+
+    SearchResult:
+      allOf:
+        - $ref: '#/components/schemas/Vehicle'
+      description: A vehicle record returned by the search service.
+
+    SearchResponse:
       type: object
       properties:
-        status:
-          type: string
-          enum: [success]
-          example: success
-        returnedRecords:
-          type: integer
-          example: 1
-        totalRecords:
-          type: integer
-          example: 24
+        info:
+          $ref: '#/components/schemas/ResultInfo'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchResult'
+        aggregations:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: object
+              properties:
+                code:
+                  type: string
+                description:
+                  type: string
 
     Error:
       type: object
@@ -104,41 +280,31 @@ components:
           example: invalid_request
         detail:
           type: string
-          example: The requested resource could not be processed.
+          example: The supplied request could not be processed.
 
 paths:
   /vehicles/list:
     get:
       tags: [Vehicles]
-      summary: List available vehicles
+      summary: List vehicles
       description: Returns a paginated collection of vehicles matching the supplied filters.
       parameters:
         - name: page
           in: query
           required: true
-          schema:
-            type: integer
-            minimum: 0
+          schema: { type: integer, minimum: 0 }
           description: Zero-based page number.
           example: 0
         - name: marketCode
           in: query
-          schema:
-            type: string
+          schema: { type: string }
           description: Optional market filter.
           example: ES
-        - name: salesChannel
+        - name: status
           in: query
-          schema:
-            type: string
-          description: Optional sales-channel filter.
-          example: retail
-        - name: ecommerceReady
-          in: query
-          schema:
-            type: boolean
-          description: Filter vehicles that are ready for online sales.
-          example: true
+          schema: { type: string }
+          description: Optional availability filter.
+          example: available
       responses:
         '200':
           description: Vehicles returned successfully.
@@ -146,35 +312,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VehicleListResponse'
-        '400':
-          description: Invalid query parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Authentication failed.
-        '403':
-          description: Access denied.
-        '500':
-          description: Unexpected server error.
+        '400': { description: Invalid query parameters. }
+        '401': { description: Authentication failed. }
+        '403': { description: Access denied. }
+        '500': { description: Unexpected server error. }
 
   /vehicles/details:
     get:
       tags: [Vehicles]
       summary: Get vehicle details
-      description: Retrieves detailed information for a specific vehicle using an identifying query parameter.
+      description: Retrieves detailed information for a specific vehicle.
       parameters:
         - name: vehicleId
           in: query
-          schema:
-            type: string
+          schema: { type: string }
           description: Unique vehicle identifier.
           example: VEH-0001842
         - name: configurationId
           in: query
-          schema:
-            type: string
+          schema: { type: string }
           description: Vehicle configuration identifier.
           example: CFG-78421
       responses:
@@ -184,53 +340,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VehicleDetailResponse'
-        '400':
-          description: Missing or invalid identifier.
-        '401':
-          description: Authentication failed.
-        '404':
-          description: Vehicle not found.
-        '500':
-          description: Unexpected server error.
+        '400': { description: Missing or invalid identifier. }
+        '401': { description: Authentication failed. }
+        '404': { description: Vehicle not found. }
+        '500': { description: Unexpected server error. }
 
   /vehicles/search:
-    get:
+    post:
       tags: [Vehicles]
       summary: Search vehicles
       description: |
-        Portfolio adaptation: provides a task-oriented search endpoint for the documentation example.
-        It is not copied from the source specification.
+        Searches vehicle inventory using structured filters. The search contract
+        supports pagination, identifier filters, product attributes, availability,
+        date and price ranges, sorting, and optional aggregations.
       parameters:
-        - name: query
-          in: query
-          required: true
-          schema:
-            type: string
-          description: Free-text search term.
-          example: available electric vehicle
-        - name: marketCode
-          in: query
-          schema:
-            type: string
-          description: Optional market filter.
-          example: ES
-        - name: page
-          in: query
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
-          description: Zero-based page number.
+        - name: accept-language
+          in: header
+          schema: { type: string }
+          description: Preferred response language.
+          example: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+            example:
+              page: 0
+              perPage: 20
+              marketCode: [ES]
+              bodyType: [SUV]
+              engineConcept: [hybrid]
+              onlineAvailable: [true]
+              grossListPrice:
+                min: 30000
+                max: 60000
+              sortBy:
+                fieldName: estimatedDeliveryDate
+                sortType: ASC
       responses:
         '200':
           description: Search results returned successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VehicleListResponse'
+                $ref: '#/components/schemas/SearchResponse'
         '400':
-          description: Invalid search parameters.
-        '401':
-          description: Authentication failed.
-        '500':
-          description: Unexpected server error.
+          description: Invalid search criteria or request body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': { description: Authentication failed. }
+        '403': { description: Access denied. }
+        '500': { description: Unexpected server error. }
