@@ -1,0 +1,236 @@
+openapi: 3.0.3
+info:
+  title: Vehicle Inventory API
+  version: 1.0.0
+  description: |
+    A portfolio-safe API specification for a vehicle inventory service.
+    The API exposes vehicle availability, detail retrieval, and search capabilities.
+
+servers:
+  - url: https://api.example.com/v1
+    description: Example API server
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Vehicle:
+      type: object
+      required:
+        - id
+        - configurationId
+        - marketCode
+        - status
+      properties:
+        id:
+          type: string
+          description: Unique vehicle identifier.
+          example: VEH-0001842
+        configurationId:
+          type: string
+          description: Identifier of the vehicle configuration.
+          example: CFG-78421
+        marketCode:
+          type: string
+          description: Market associated with the vehicle.
+          example: ES
+        salesChannel:
+          type: string
+          description: Sales channel where the vehicle is available.
+          example: retail
+        status:
+          type: string
+          description: Current availability status.
+          enum: [available, reserved, sold]
+          example: available
+        productionStatus:
+          type: string
+          description: Current production stage.
+          example: ready
+        productionDate:
+          type: string
+          format: date-time
+          description: Production date and time, when available.
+          example: '2026-01-25T00:00:00Z'
+        ecommerceReady:
+          type: boolean
+          description: Indicates whether the vehicle is ready for an online sales flow.
+          example: true
+
+    VehicleListResponse:
+      type: object
+      properties:
+        info:
+          $ref: '#/components/schemas/ResultInfo'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vehicle'
+
+    VehicleDetailResponse:
+      type: object
+      properties:
+        info:
+          $ref: '#/components/schemas/ResultInfo'
+        data:
+          $ref: '#/components/schemas/Vehicle'
+
+    ResultInfo:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+          example: success
+        returnedRecords:
+          type: integer
+          example: 1
+        totalRecords:
+          type: integer
+          example: 24
+
+    Error:
+      type: object
+      properties:
+        type:
+          type: string
+          example: invalid_request
+        detail:
+          type: string
+          example: The requested resource could not be processed.
+
+paths:
+  /vehicles/list:
+    get:
+      tags: [Vehicles]
+      summary: List available vehicles
+      description: Returns a paginated collection of vehicles matching the supplied filters.
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: Zero-based page number.
+          example: 0
+        - name: marketCode
+          in: query
+          schema:
+            type: string
+          description: Optional market filter.
+          example: ES
+        - name: salesChannel
+          in: query
+          schema:
+            type: string
+          description: Optional sales-channel filter.
+          example: retail
+        - name: ecommerceReady
+          in: query
+          schema:
+            type: boolean
+          description: Filter vehicles that are ready for online sales.
+          example: true
+      responses:
+        '200':
+          description: Vehicles returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleListResponse'
+        '400':
+          description: Invalid query parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed.
+        '403':
+          description: Access denied.
+        '500':
+          description: Unexpected server error.
+
+  /vehicles/details:
+    get:
+      tags: [Vehicles]
+      summary: Get vehicle details
+      description: Retrieves detailed information for a specific vehicle using an identifying query parameter.
+      parameters:
+        - name: vehicleId
+          in: query
+          schema:
+            type: string
+          description: Unique vehicle identifier.
+          example: VEH-0001842
+        - name: configurationId
+          in: query
+          schema:
+            type: string
+          description: Vehicle configuration identifier.
+          example: CFG-78421
+      responses:
+        '200':
+          description: Vehicle details returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDetailResponse'
+        '400':
+          description: Missing or invalid identifier.
+        '401':
+          description: Authentication failed.
+        '404':
+          description: Vehicle not found.
+        '500':
+          description: Unexpected server error.
+
+  /vehicles/search:
+    get:
+      tags: [Vehicles]
+      summary: Search vehicles
+      description: |
+        Portfolio adaptation: provides a task-oriented search endpoint for the documentation example.
+        It is not copied from the source specification.
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Free-text search term.
+          example: available electric vehicle
+        - name: marketCode
+          in: query
+          schema:
+            type: string
+          description: Optional market filter.
+          example: ES
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Zero-based page number.
+      responses:
+        '200':
+          description: Search results returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleListResponse'
+        '400':
+          description: Invalid search parameters.
+        '401':
+          description: Authentication failed.
+        '500':
+          description: Unexpected server error.

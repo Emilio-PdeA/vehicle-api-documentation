@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vehicle Inventory API</title>
+<style>
+:root{--navy:#0b1f33;--navy2:#102a43;--teal:#19b5a5;--bg:#fff;--muted:#64748b;--line:#e5e7eb;--code:#f6f8fa;--sidebar:#fbfcfd;--method:#0f766e}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172033;background:var(--bg);line-height:1.6}.layout{display:grid;grid-template-columns:270px minmax(0,1fr);min-height:100vh}.sidebar{position:sticky;top:0;height:100vh;overflow:auto;border-right:1px solid var(--line);background:var(--sidebar);padding:28px 20px}.brand{font-weight:750;color:var(--navy);font-size:17px;margin-bottom:6px}.version{font-size:12px;color:var(--muted);margin-bottom:28px}.nav-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin:22px 0 8px}.nav a{display:block;padding:8px 9px;border-radius:7px;color:#475569;text-decoration:none;font-size:14px}.nav a:hover{background:#eef7f6;color:var(--navy)}.nav .method{display:inline-block;font-size:10px;font-weight:800;color:var(--method);background:#dff7f3;padding:2px 5px;border-radius:4px;margin-right:6px;vertical-align:1px}.main{max-width:1100px;width:100%;padding:64px 70px}.eyebrow{color:var(--teal);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.hero h1{font-size:44px;line-height:1.1;color:var(--navy);letter-spacing:-.035em;margin:10px 0 16px}.hero p{max-width:720px;color:#526176;font-size:17px}.notice{border-left:3px solid var(--teal);background:#f1fbfa;padding:14px 18px;margin:30px 0 50px;color:#334155}.section{padding:55px 0;border-top:1px solid var(--line)}h2{font-size:28px;color:var(--navy);margin:0 0 12px;letter-spacing:-.02em}h3{font-size:20px;color:var(--navy);margin-top:32px}.endpoint{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:26px}.endpoint-head{padding:18px 20px;background:#fff;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)}.verb{font-size:12px;font-weight:850;color:white;background:var(--method);padding:5px 8px;border-radius:5px}.path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:var(--navy)}.endpoint-body{padding:22px}.endpoint-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}.label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:7px}.param{border-top:1px solid var(--line);padding:12px 0}.param:first-child{border-top:0}.param-name{font-family:ui-monospace,monospace;font-weight:700;color:var(--navy)}.type{font-size:11px;color:#64748b;margin-left:7px}.required{font-size:10px;color:#b45309;margin-left:7px}.desc{font-size:13px;color:#64748b;margin-top:3px}pre{background:var(--code);border:1px solid #e8ebef;border-radius:8px;padding:16px;overflow:auto;font-size:12px;line-height:1.6}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}table{width:100%;border-collapse:collapse;margin:18px 0}th,td{text-align:left;border-bottom:1px solid var(--line);padding:11px 10px;font-size:13px}th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#64748b}.pill{display:inline-block;border:1px solid #d8e4e3;color:#0f766e;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:700}.footer{padding:45px 0;color:#94a3b8;font-size:12px}@media(max-width:800px){.layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line)}.main{padding:38px 24px}.endpoint-grid{grid-template-columns:1fr}.hero h1{font-size:36px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="brand">Vehicle Inventory API</div>
+  <div class="version">v1.0.0 · REST API</div>
+  <nav class="nav">
+    <div class="nav-title">Overview</div>
+    <a href="#overview">Introduction</a>
+    <a href="#authentication">Authentication</a>
+    <div class="nav-title">Vehicles</div>
+    <a href="#list"><span class="method">GET</span>/vehicles/list</a>
+    <a href="#details"><span class="method">GET</span>/vehicles/details</a>
+    <a href="#search"><span class="method">GET</span>/vehicles/search</a>
+    <div class="nav-title">Reference</div>
+    <a href="#errors">Errors</a>
+  </nav>
+</aside>
+<main class="main">
+<section class="hero" id="overview">
+  <div class="eyebrow">Developer documentation</div>
+  <h1>Vehicle Inventory API</h1>
+  <p>A task-oriented REST API for retrieving vehicle availability, detailed vehicle information, and filtered search results.</p>
+  <div class="notice"><strong>Portfolio project.</strong> This documentation is an anonymized reconstruction created to demonstrate technical writing, API information architecture, and developer-focused communication.</div>
+</section>
+
+<section class="section" id="authentication">
+  <h2>Authentication</h2>
+  <p>Requests use bearer-token authentication. Include your access token in the <code>Authorization</code> header.</p>
+<pre><code>Authorization: Bearer YOUR_ACCESS_TOKEN</code></pre>
+</section>
+
+<section class="section" id="list">
+  <div class="eyebrow">Vehicles</div><h2>List available vehicles</h2>
+  <p>Retrieve a paginated collection of vehicles. Optional filters can narrow results by market, sales channel, or online-sales readiness.</p>
+  <div class="endpoint"><div class="endpoint-head"><span class="verb">GET</span><span class="path">/vehicles/list</span></div><div class="endpoint-body">
+    <div class="endpoint-grid"><div><div class="label">Query parameters</div>
+      <div class="param"><span class="param-name">page</span><span class="type">integer</span><span class="required">required</span><div class="desc">Zero-based page number.</div></div>
+      <div class="param"><span class="param-name">marketCode</span><span class="type">string</span><div class="desc">Optional market filter.</div></div>
+      <div class="param"><span class="param-name">salesChannel</span><span class="type">string</span><div class="desc">Optional sales-channel filter.</div></div>
+      <div class="param"><span class="param-name">ecommerceReady</span><span class="type">boolean</span><div class="desc">Return only vehicles ready for an online sales flow.</div></div>
+    </div><div><div class="label">Example request</div><pre><code>GET /v1/vehicles/list?page=0&amp;marketCode=ES&amp;ecommerceReady=true</code></pre><div class="label">Response</div><pre><code>{
+  "info": {
+    "status": "success",
+    "returnedRecords": 1,
+    "totalRecords": 24
+  },
+  "data": [
+    {
+      "id": "VEH-0001842",
+      "configurationId": "CFG-78421",
+      "marketCode": "ES",
+      "status": "available"
+    }
+  ]
+}</code></pre></div></div>
+  </div></div>
+</section>
+
+<section class="section" id="details">
+  <div class="eyebrow">Vehicles</div><h2>Get vehicle details</h2>
+  <p>Retrieve detailed information for a specific vehicle using its identifier or configuration identifier.</p>
+  <div class="endpoint"><div class="endpoint-head"><span class="verb">GET</span><span class="path">/vehicles/details</span></div><div class="endpoint-body">
+    <div class="endpoint-grid"><div><div class="label">Query parameters</div>
+      <div class="param"><span class="param-name">vehicleId</span><span class="type">string</span><div class="desc">Unique vehicle identifier.</div></div>
+      <div class="param"><span class="param-name">configurationId</span><span class="type">string</span><div class="desc">Vehicle configuration identifier.</div></div>
+    </div><div><div class="label">Example request</div><pre><code>GET /v1/vehicles/details?vehicleId=VEH-0001842</code></pre><div class="label">Response</div><pre><code>{
+  "info": { "status": "success" },
+  "data": {
+    "id": "VEH-0001842",
+    "configurationId": "CFG-78421",
+    "marketCode": "ES",
+    "status": "available",
+    "ecommerceReady": true
+  }
+}</code></pre></div></div>
+  </div></div>
+</section>
+
+<section class="section" id="search">
+  <div class="eyebrow">Vehicles</div><h2>Search vehicles</h2>
+  <p>Search the vehicle inventory using a free-text query and optional market filter.</p>
+  <div class="endpoint"><div class="endpoint-head"><span class="verb">GET</span><span class="path">/vehicles/search</span></div><div class="endpoint-body">
+    <div class="endpoint-grid"><div><div class="label">Query parameters</div>
+      <div class="param"><span class="param-name">query</span><span class="type">string</span><span class="required">required</span><div class="desc">Free-text search term.</div></div>
+      <div class="param"><span class="param-name">marketCode</span><span class="type">string</span><div class="desc">Optional market filter.</div></div>
+      <div class="param"><span class="param-name">page</span><span class="type">integer</span><div class="desc">Zero-based page number.</div></div>
+    </div><div><div class="label">Example request</div><pre><code>GET /v1/vehicles/search?query=available%20vehicle&amp;marketCode=ES</code></pre><div class="label">Response</div><pre><code>{
+  "info": {
+    "status": "success",
+    "returnedRecords": 2,
+    "totalRecords": 2
+  },
+  "data": [
+    { "id": "VEH-0001842", "status": "available" },
+    { "id": "VEH-0001921", "status": "available" }
+  ]
+}</code></pre></div></div>
+  </div></div>
+  <div class="notice"><strong>Documentation note:</strong> the search endpoint is a portfolio adaptation. The supplied source specification contains vehicle list and detail endpoints, but no <code>/search</code> path. It is intentionally separated from the source implementation rather than presented as an original endpoint.</div>
+</section>
+
+<section class="section" id="errors"><h2>Errors</h2><p>The API communicates request failures through standard HTTP status codes.</p><table><thead><tr><th>Status</th><th>Meaning</th><th>Typical cause</th></tr></thead><tbody><tr><td><span class="pill">400</span></td><td>Bad Request</td><td>Invalid or missing query parameter.</td></tr><tr><td><span class="pill">401</span></td><td>Unauthorized</td><td>Missing or invalid bearer token.</td></tr><tr><td><span class="pill">403</span></td><td>Forbidden</td><td>The token does not have permission for the requested resource.</td></tr><tr><td><span class="pill">404</span></td><td>Not Found</td><td>The requested vehicle does not exist.</td></tr><tr><td><span class="pill">500</span></td><td>Server Error</td><td>Unexpected service failure.</td></tr></tbody></table></section>
+<div class="footer">Technical writing portfolio sample · Sanitized and reconstructed for demonstration purposes.</div>
+</main></div>
+</body></html>
